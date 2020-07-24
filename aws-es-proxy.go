@@ -187,7 +187,7 @@ func (p *proxy) parseEndpoint() error {
 func (p *proxy) getSigner() *v4.Signer {
 	// Refresh credentials after expiration. Required for STS
 	if p.credentials == nil {
-		var sess
+		sess := nil
 		// Attempt to detect region and assume endpoint is in the same region as we are
 		if p.region == "" {			
 			sess, err := session.NewSession(
