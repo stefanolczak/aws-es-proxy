@@ -198,7 +198,7 @@ func (p *proxy) getSigner() *v4.Signer {
 			if err != nil {
 				logrus.Debugln(err)
 			}
-			p.region := &sess.Config.Region
+			p.region := *sess.Config.Region
 		} else {
 			sess, err := session.NewSession(
 				&aws.Config{
