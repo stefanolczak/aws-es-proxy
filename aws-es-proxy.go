@@ -179,7 +179,8 @@ func (p *proxy) parseEndpoint() error {
 				parts := strings.Split(link.Host, ".")
 				p.region = parts[1]
 			} else {
-				p.region = *session.NewSession().Config.Region
+				sess, err := session.NewSession()
+				p.region = *sess.Config.Region
 			}
 		}
 		logrus.Debugln("AWS Region", p.region)
