@@ -180,6 +180,9 @@ func (p *proxy) parseEndpoint() error {
 				p.region = parts[1]
 			} else {
 				sess, err := session.NewSession()
+				if err != nil {
+					logrus.Debugln(err)
+				}
 				p.region = *sess.Config.Region
 			}
 		}
