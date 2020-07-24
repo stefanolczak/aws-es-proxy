@@ -190,7 +190,6 @@ func (p *proxy) getSigner() *v4.Signer {
 
 		sess, err := session.NewSession(
 			&aws.Config{
-				Region:                        aws.String(p.region),
 				CredentialsChainVerboseErrors: aws.Bool(true),
 			},
 		)
@@ -453,7 +452,7 @@ func main() {
 	flag.StringVar(&username, "username", "", "HTTP Basic Auth Username")
 	flag.StringVar(&password, "password", "", "HTTP Basic Auth Password")
 	flag.StringVar(&realm, "realm", "", "Authentication Required")
-	flag.StringVar(&region, "region", "us-east-1", "AWS region to be used instead of extracting it from endpoint")
+	flag.StringVar(&region, "region", "", "AWS region to be used instead of extracting it from endpoint")
 	flag.Parse()
 
 	if endpoint == "" {
