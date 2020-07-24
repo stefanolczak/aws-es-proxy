@@ -174,7 +174,7 @@ func (p *proxy) parseEndpoint() error {
 
 		p.service = "es"
 		if p.region == "" {
-			if isAWSEndpoint
+			if isAWSEndpoint {
 				// Extract region and service from link. This should be save now
 				parts := strings.Split(link.Host, ".")
 				p.region = parts[1]
@@ -191,6 +191,7 @@ func (p *proxy) parseEndpoint() error {
 func (p *proxy) getSigner() *v4.Signer {
 	// Refresh credentials after expiration. Required for STS
 	if p.credentials == nil {
+
 		sess, err := session.NewSession(
 			&aws.Config{
 				Region:                        aws.String(p.region),
