@@ -187,7 +187,7 @@ func (p *proxy) parseEndpoint() error {
 func (p *proxy) getSigner() *v4.Signer {
 	// Refresh credentials after expiration. Required for STS
 	if p.credentials == nil {
-		sess := nil
+		var sess aws.Session
 		// Attempt to detect region and assume endpoint is in the same region as we are
 		if p.region == "" {			
 			sess, err := session.NewSession(
@@ -198,7 +198,7 @@ func (p *proxy) getSigner() *v4.Signer {
 			if err != nil {
 				logrus.Debugln(err)
 			}
-			p.region = sess.Config.Region
+			p.region := sess.Config.Region
 		} else {
 			sess, err := session.NewSession(
 				&aws.Config{
