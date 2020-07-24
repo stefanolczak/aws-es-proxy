@@ -86,6 +86,7 @@ type proxy struct {
 	username     string
 	password     string
 	realm        string
+	region       string
 }
 
 func newProxy(args ...interface{}) *proxy {
@@ -110,6 +111,7 @@ func newProxy(args ...interface{}) *proxy {
 		username:   args[7].(string),
 		password:   args[8].(string),
 		realm:      args[9].(string),
+		region:     args[10].(string)
 	}
 }
 
@@ -171,12 +173,13 @@ func (p *proxy) parseEndpoint() error {
 			}
 		}
 
-		if isAWSEndpoint {
+		p.service = "es"
+		if isAWSEndpoint && p.region == "" {
 			// Extract region and service from link. This should be save now
 			parts := strings.Split(link.Host, ".")
-			p.region, p.service = parts[1], "es"
-			logrus.Debugln("AWS Region", p.region)
+			p.region = parts[1]
 		}
+		logrus.Debugln("AWS Region", p.region)
 	}
 
 	return nil
@@ -215,7 +218,6 @@ func (p *proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
 
 		if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(p.username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(p.password)) != 1 {
-			w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=\"%s\"", p.realm))
 			w.WriteHeader(401)
 			_, _ = w.Write([]byte("Unauthorised.\n"))
 			return
@@ -432,6 +434,7 @@ func main() {
 		ver           bool
 		endpoint      string
 		listenAddress string
+		region        string
 		fileRequest   *os.File
 		fileResponse  *os.File
 		err           error
@@ -451,6 +454,7 @@ func main() {
 	flag.StringVar(&username, "username", "", "HTTP Basic Auth Username")
 	flag.StringVar(&password, "password", "", "HTTP Basic Auth Password")
 	flag.StringVar(&realm, "realm", "", "Authentication Required")
+	flag.StringVar(&region, "region", "", "AWS region to be used instead of extracting it from endpoint")
 	flag.Parse()
 
 	if endpoint == "" {
@@ -496,6 +500,7 @@ func main() {
 		username,
 		password,
 		realm,
+		region
 	)
 
 	if err = p.parseEndpoint(); err != nil {
