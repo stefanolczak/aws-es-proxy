@@ -86,7 +86,6 @@ type proxy struct {
 	username     string
 	password     string
 	realm        string
-	region       string
 }
 
 func newProxy(args ...interface{}) *proxy {
