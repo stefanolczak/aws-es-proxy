@@ -111,7 +111,7 @@ func newProxy(args ...interface{}) *proxy {
 		username:   args[7].(string),
 		password:   args[8].(string),
 		realm:      args[9].(string),
-		region:     args[10].(string)
+		region:     args[10].(string),
 	}
 }
 
@@ -454,7 +454,7 @@ func main() {
 	flag.StringVar(&username, "username", "", "HTTP Basic Auth Username")
 	flag.StringVar(&password, "password", "", "HTTP Basic Auth Password")
 	flag.StringVar(&realm, "realm", "", "Authentication Required")
-	flag.StringVar(&region, "region", "", "AWS region to be used instead of extracting it from endpoint")
+	flag.StringVar(&region, "region", "us-east-1", "AWS region to be used instead of extracting it from endpoint")
 	flag.Parse()
 
 	if endpoint == "" {
@@ -500,7 +500,7 @@ func main() {
 		username,
 		password,
 		realm,
-		region
+		region,
 	)
 
 	if err = p.parseEndpoint(); err != nil {
