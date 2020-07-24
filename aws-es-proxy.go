@@ -173,10 +173,14 @@ func (p *proxy) parseEndpoint() error {
 		}
 
 		p.service = "es"
-		if isAWSEndpoint && p.region == "" {
-			// Extract region and service from link. This should be save now
-			parts := strings.Split(link.Host, ".")
-			p.region = parts[1]
+		if p.region == "" {
+			if isAWSEndpoint
+				// Extract region and service from link. This should be save now
+				parts := strings.Split(link.Host, ".")
+				p.region = parts[1]
+			} else {
+				p.region = *session.NewSession().Config.Region
+			}
 		}
 		logrus.Debugln("AWS Region", p.region)
 	}
@@ -187,28 +191,14 @@ func (p *proxy) parseEndpoint() error {
 func (p *proxy) getSigner() *v4.Signer {
 	// Refresh credentials after expiration. Required for STS
 	if p.credentials == nil {
-		var sess *aws.Session
-		// Attempt to detect region and assume endpoint is in the same region as we are
-		if p.region == "" {			
-			sess, err := session.NewSession(
-				&aws.Config{
-					CredentialsChainVerboseErrors: aws.Bool(true),
-				},
-			)
-			if err != nil {
-				logrus.Debugln(err)
-			}
-			p.region := *sess.Config.Region
-		} else {
-			sess, err := session.NewSession(
-				&aws.Config{
-					Region:                        aws.String(p.region),
-					CredentialsChainVerboseErrors: aws.Bool(true),
-				},
-			)
-			if err != nil {
-				logrus.Debugln(err)
-			}
+		sess, err := session.NewSession(
+			&aws.Config{
+				Region:                        aws.String(p.region),
+				CredentialsChainVerboseErrors: aws.Bool(true),
+			},
+		)
+		if err != nil {
+			logrus.Debugln(err)
 		}
 
 		credentials := sess.Config.Credentials
