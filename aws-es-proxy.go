@@ -180,19 +180,17 @@ func (p *proxy) parseEndpoint() error {
 				parts := strings.Split(link.Host, ".")
 				p.region = parts[1]
 			} else {
-				logrus.Debugln("Detecting AWS region")
+				// Let's detect AWS region and assume ES endpoint is in the same region as we are
+				logrus.Debugln("Detecting AWS region from EC2 metadata")
 				sess, err := session.NewSession()
 				if err != nil {
 					logrus.Debugln(err)
 				}
-				logrus.Debugln("Session region", *sess.Config.Region)
-				svc := ec2metadata.New(sess)
-				region, err := svc.Region()
+				metaClient := ec2metadata.New(sess)
+				p.region, err := metaClient.Region()
 				if err != nil {
 					logrus.Debugln(err)
 				}
-				logrus.Debugln("EC2 metadata region", region)
-				p.region = region
 			}
 		}
 		logrus.Debugln("AWS Region", p.region)
