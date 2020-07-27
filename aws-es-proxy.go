@@ -186,7 +186,7 @@ func (p *proxy) parseEndpoint() error {
 					logrus.Debugln(err)
 				}
 				logrus.Debugln("Session region", sess.Config.Region)
-				svc := ec2metadata.New(mySession)
+				svc := ec2metadata.New(sess)
 				region, err2 = svc.Region()
 				if err2 != nil {
 					logrus.Debugln(err)
