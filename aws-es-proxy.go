@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	v4 "github.com/aws/aws-sdk-go/aws/signer/v4"
@@ -184,7 +185,14 @@ func (p *proxy) parseEndpoint() error {
 				if err != nil {
 					logrus.Debugln(err)
 				}
-				p.region = *sess.Config.Region
+				logrus.Debugln("Session region", sess.Config.Region)
+				svc := ec2metadata.New(mySession)
+				region, err2 = svc.Region()
+				if err2 != nil {
+					logrus.Debugln(err)
+				}
+				logrus.Debugln("EC2 metadata region", region)
+				p.region = region
 			}
 		}
 		logrus.Debugln("AWS Region", p.region)
